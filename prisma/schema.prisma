@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// schema - how we want our table to be like.
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // prisma will automatically add the updated at time .
+
+  @@map("users")
+}
+
+//@@map  It lets you say: "call it User in my code, but create it as Users in the database."
+
+/**
+ * JavaScript/TypeScript people name things singular and PascalCase: User, EventType, Booking.
+ * That matches how classes and types are normally named.
+ * SQL/database people often name tables plural and lowercase: users, event_types, bookings.
+ * That's just the convention that grew up in that world.
+ * Without @@map you have to pick one convention and let it leak into the other world.
+ * With @@map, each side gets the naming style that feels natural to it.
+ */
