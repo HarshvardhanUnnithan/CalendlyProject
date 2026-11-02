@@ -7,8 +7,11 @@ Controller functions call our service layer.
 */
 
 import { Request, Response } from "express"
-import { findallusers as findAllUsersService, findbyid as findbyidservice } from "../services/user.service.js"
-
+import {
+    findallusers as findAllUsersService, findbyid as findbyidservice, deletebyid as deletebyidservice,
+    createuser as createuserService
+} from "../services/user.service.js"
+import { sendsuccess } from "../utils/api_response.js"
 
 export async function findlAllUsers(_req: Request, res: Response) {
     const users = await findAllUsersService()
@@ -36,3 +39,17 @@ The name inside the braces is doing double duty.It's the property key to look up
 ,at the same time.Case-sensitive, exact match.
 
 */
+
+export async function deleteuserByID(req: Request, res: Response) {
+    const { id } = req.params;
+    const response = await deletebyidservice(Number(id))
+    sendsuccess(res, response, 200, "User deleted successfully")
+
+}
+
+
+export async function createuser(req: Request, res: Response) {
+    const { name, email } = req.body;
+    const response = await createuserService({ name, email })
+    sendsuccess(res, response, 201, "User created successfully")
+}

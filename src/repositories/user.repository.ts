@@ -17,3 +17,20 @@ export async function getuserbyid(id: number) {
     return user
 }
 
+export async function removeuserbyid(id: number) {
+    const user = prisma.user.delete(
+        {
+            where: { "id": id }
+        }
+    )
+    return user
+}
+
+export async function createuser(user: { name: string, email: string }) {
+    const newuser = prisma.user.create(
+        {
+            data: user
+        }
+    )
+    return newuser
+}

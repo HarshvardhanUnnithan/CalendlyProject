@@ -1,7 +1,7 @@
 
 //Business Logic
 
-import { getAll, getuserbyid } from "../repositories/user.repository.js"
+import { createuser as createuserRepo, getAll, getuserbyid, removeuserbyid } from "../repositories/user.repository.js"
 import { NotFound } from "../utils/api_errors.js"
 
 export async function findallusers() {
@@ -17,4 +17,15 @@ export async function findbyid(id: number) {
         throw NotFound("User Not found")
     }
     return user
+}
+
+export async function deletebyid(id: number) {
+    const user = await removeuserbyid(id)
+    return user
+}
+
+
+export async function createuser(user: { name: string, email: string }) {
+    const newuser = await createuserRepo(user)
+    return newuser
 }

@@ -1,0 +1,14 @@
+$kind: http-request
+name: New Request
+url: "{{devserver}}/users/"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"name\": \"hhhhh\",\r
+
+    \    \"email\": \"unnithanharsh@gmail.com\"\r
+
+    }"
+order: 1324

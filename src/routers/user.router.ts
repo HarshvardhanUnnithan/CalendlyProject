@@ -1,6 +1,7 @@
 import { Router } from "express"
-import { finduserByID, findlAllUsers } from "../controllers/user.controller.js"
-
+import { finduserByID, findlAllUsers, createuser, deleteuserByID } from "../controllers/user.controller.js"
+import { validate } from "../Middlewares/validate.js"
+import { Userschema } from "../Dto's/user.dto.js"
 export const userRouter: Router = Router()
 // everything written  in app.use() will be seen here.
 
@@ -18,3 +19,6 @@ userRouter.get("/", findlAllUsers)-if its a get request and nothing is written a
 :id - Specifies id can be  diffrent values and not a fixed value.
 :id is a route parameter ,matches exactly one path segment
 */
+
+userRouter.delete("/:id", deleteuserByID)
+userRouter.post("/", validate(Userschema), createuser)

@@ -15,11 +15,12 @@ export function error_handler(err: Error, _req: Request, res: Response, _next: N
     }
 
     console.error("[Error]", err)
-
     const body: Record<string, unknown> = {
         success: false,
         message: "Something Wrong Occured"
     }
+
+
     if (NodeEnv == "development") body.details = err.stack;
     res.status(500).json(body)
 
