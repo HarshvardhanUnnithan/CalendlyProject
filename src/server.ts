@@ -4,12 +4,12 @@ opening a database connection and binding a network port.
 */
 
 import { app } from "./app.js"
-import { connectdatabase } from "./config/database.js"
+import { connectDatabase } from "./config/database.js"
 import { PORT } from "./config/env.js"
 
 
-async function startserver() {
-    await connectdatabase()
+async function startServer() {
+    await connectDatabase()
     app.listen(PORT, () => {
         console.log(`[Server]:Running on Port ${PORT}`);
     })
@@ -27,7 +27,7 @@ app.listen(PORT, callback): listen() asks the operating system to reserve a port
 and the callback fires later, once the OS has actually granted the binding.
 */
 
-startserver().catch((error) => {
+startServer().catch((error) => {
     console.error("Port Error: ", error);
     process.exit(1);
 

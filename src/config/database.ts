@@ -25,7 +25,7 @@ Tells Prisma: don't try to connect on your own — send every query through this
 */
 
 
-export async function connectdatabase() {
+export async function connectDatabase() {
     try {
         await prisma.$connect()
     }

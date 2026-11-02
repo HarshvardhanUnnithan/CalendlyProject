@@ -1,31 +1,49 @@
 
 //Business Logic
 
-import { createuser as createuserRepo, getAll, getuserbyid, removeuserbyid } from "../repositories/user.repository.js"
-import { NotFound } from "../utils/api_errors.js"
+import type { CreateUserDto, UpdateUserDto } from "../dtos/user.dto.js"
+import * as userRepository from "../repositories/user.repository.js"
+import { conflict, notFound } from "../utils/api-error.js"
 
-export async function findallusers() {
-    const users = await getAll()
+export async function getAllUsers() {
+    const users = await userRepository.findAll()
     return users
 }
 
-export async function findbyid(id: number) {
-    const user = await getuserbyid(id)
-    if (!user)// if statements require statements to be true to run,then empty or falsy 
+export async function getUserById(id: number) {
+    const user = await userRepository.findById(id)
+    if (!user)// if statements require statements to be true to run,then empty or falsy
     //values need to be converted to true.
     {
-        throw NotFound("User Not found")
+        throw notFound("User Not found")
     }
     return user
 }
 
-export async function deletebyid(id: number) {
-    const user = await removeuserbyid(id)
+export async function deleteUser(id: number) {
+    await getUserById(id)
+    const user = await userRepository.deleteById(id)
+    return user
+}
+
+export async function updateUser(id: number, data: UpdateUserDto) {
+    await getUserById(id)
+    if (data.email) {
+        const existingUser = await userRepository.findByEmail(data.email)
+        if (existingUser && existingUser.id !== id) {
+            throw conflict("User with this email already exists")
+        }
+    }
+    const user = await userRepository.updateById(id, data)
     return user
 }
 
 
-export async function createuser(user: { name: string, email: string }) {
-    const newuser = await createuserRepo(user)
-    return newuser
+export async function createUser(data: CreateUserDto) {
+    const existingUser = await userRepository.findByEmail(data.email);
+    if (existingUser) {
+        throw new Error("User with this email already exists");
+    }
+    const newUser = await userRepository.create(data);
+    return newUser;
 }

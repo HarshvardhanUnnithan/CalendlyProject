@@ -1,16 +1,17 @@
 import type { Request, Response, NextFunction } from "express";
-import { api_error } from "../utils/api_errors.js";
-import { NodeEnv } from "../config/env.js";
 
-export function error_handler(err: Error, _req: Request, res: Response, _next: NextFunction) {
+import { NODE_ENV } from "../config/env.js";
+import { ApiError } from "../utils/api-error.js";
 
-    if (err instanceof api_error) {
+export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
+
+    if (err instanceof ApiError) {
         const body: Record<string, unknown> = {
             success: false,
             message: err.message
         }
         if (err.details) body.details = err.details
-        res.status(err.statuscode).json(body)
+        res.status(err.statusCode).json(body)
         return;
     }
 
@@ -21,7 +22,7 @@ export function error_handler(err: Error, _req: Request, res: Response, _next: N
     }
 
 
-    if (NodeEnv == "development") body.details = err.stack;
+    if (NODE_ENV === "development") body.details = err.stack;
     res.status(500).json(body)
 
 }

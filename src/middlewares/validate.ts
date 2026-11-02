@@ -1,6 +1,7 @@
-import { NextFunction, Request, Response } from "express";
-import { ZodType } from "zod";
-import { BadRequest } from "../utils/api_errors.js";
+import type { NextFunction, Request, Response } from "express";
+import type { ZodType } from "zod";
+
+import { badRequest } from "../utils/api-error.js";
 
 
 //When you write a function, ask:
@@ -11,7 +12,7 @@ export const validate = (schema: ZodType) =>
         const result = schema.safeParse(req.body);
 
         if (!result.success) {
-            throw BadRequest("Validation failed", result.error.issues);
+            throw badRequest("Validation failed", result.error.issues);
         }
 
         req.body = result.data;

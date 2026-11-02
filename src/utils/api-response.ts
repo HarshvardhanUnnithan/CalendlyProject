@@ -1,6 +1,6 @@
 // structuring the response for success.
 
-import { Response } from "express";
+import type { Response } from "express";
 
 // An interface is a list of what an object must have.
 interface SuccessPayload<T> {
@@ -9,12 +9,12 @@ interface SuccessPayload<T> {
     message?: string
 }
 
-export function sendsuccess<T>(res: Response, data: T, statuscode = 200, message?: string): void {
+export function sendSuccess<T>(res: Response, data: T, statusCode = 200, message?: string): void {
     const body: SuccessPayload<T> = {
         success: true,
         data: data
     };
 
     if (message) body.message = message;
-    res.status(statuscode).json(body)
+    res.status(statusCode).json(body)
 }
