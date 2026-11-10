@@ -20,6 +20,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt // prisma will automatically add the updated at time .
 
+  eventTypes EventType[] // one to many relationship with event types.
+
   @@map("users")
 }
 
@@ -33,3 +35,24 @@ model User {
  * Without @@map you have to pick one convention and let it leak into the other world.
  * With @@map, each side gets the naming style that feels natural to it.
  */
+
+model EventType {
+  id                  Int      @id @default(autoincrement())
+  hostId              Int
+  title               String
+  slug                String
+  description         String?
+  durationMinutes     Int
+  isActive            Boolean  @default(true)
+  locationType        String   @default("online")
+  locationValue       String?
+  bufferBeforeMinutes Int      @default(0)
+  bufferAfterMinutes  Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  host User @relation(fields: [hostId], references: [id], onDelete: Cascade)
+
+  @@unique([hostId, slug])
+  @@map("event_types")
+}

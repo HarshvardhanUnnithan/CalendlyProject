@@ -13,8 +13,10 @@ export class ApiError extends Error {
 }
 
 
-// Factory helpers: camelCase because they are plain functions, not classes (no `new` needed).
 export const badRequest = (message: string, details?: unknown) => new ApiError(400, message, details);
+export const unauthorized = (message: string, details?: unknown) => new ApiError(401, message, details)
+export const forbidden = (message: string, details?: unknown) => new ApiError(403, message, details)
 export const notFound = (message: string, details?: unknown) => new ApiError(404, message, details)
 export const conflict = (message: string, details?: unknown) => new ApiError(409, message, details)
 export const internalServerError = (message = "Internal Server Error") => new ApiError(500, message);
+

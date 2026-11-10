@@ -28,6 +28,7 @@ Tells Prisma: don't try to connect on your own — send every query through this
 export async function connectDatabase() {
     try {
         await prisma.$connect()
+        await prisma.$queryRaw`SELECT 1`
     }
     catch (error) {
         console.error("Connection Failure", error)

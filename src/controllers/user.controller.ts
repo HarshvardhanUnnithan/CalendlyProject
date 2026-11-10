@@ -18,7 +18,7 @@ and lets the controller reuse the same names (getUserById, createUser...) withou
 
 export async function getAllUsers(_req: Request, res: Response) {
     const users = await userService.getAllUsers()
-    res.json(users)
+    sendSuccess(res, users, 200, "Users fetched successfully")
 }
 
 /*
@@ -26,14 +26,15 @@ await userService.getAllUsers() — calls the service, which returns a Promise b
 await pauses this function until that Promise resolves, then hands you the resolved value (the array of users),
 not the Promise wrapper.
 
-res.json(response) — serializes the array to JSON, sets Content-Type: application/json, and sends it.
+sendSuccess(res, users, 200, ...) — wraps the array as { success: true, data: users, message }
+and passes it to res.status(200).json(), which serializes it to JSON, sets Content-Type: application/json, and sends it.
 The request is now finished.
 */
 
 export async function getUserById(req: Request, res: Response) {
     const { id } = req.params;
     const response = await userService.getUserById(Number(id))
-    res.json(response)
+    sendSuccess(res, response, 200, "User fetched successfully")
 
 }
 
@@ -61,3 +62,4 @@ export async function createUser(req: Request, res: Response) {
     const response = await userService.createUser(req.body)
     sendSuccess(res, response, 201, "User created successfully")
 }
+

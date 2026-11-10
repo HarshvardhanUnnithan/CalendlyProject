@@ -14,6 +14,7 @@ Express — a type only. TypeScript erases it at compile time, so the emitted JS
 
 import { errorHandler } from "./middlewares/error-handler.js"
 import { routeNotFound } from "./middlewares/route-not-found.js"
+import { eventRouter } from "./routers/event.router.js"
 import { userRouter } from "./routers/user.router.js"
 
 
@@ -49,6 +50,8 @@ app.get("/health", (_request, response) => {
 
 
 app.use("/users", userRouter)
+app.use("/events", eventRouter)
+
 /*
 to make sure our main app object knows about our router.
 a prefix match, and the prefix is stripped before the router sees it.
