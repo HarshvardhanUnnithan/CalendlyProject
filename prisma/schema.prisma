@@ -2,29 +2,6 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
-
-generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-}
-
-datasource db {
-  provider = "postgresql"
-}
-
-// schema - how we want our table to be like.
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt // prisma will automatically add the updated at time .
-
-  eventTypes EventType[] // one to many relationship with event types.
-
-  @@map("users")
-}
-
 //@@map  It lets you say: "call it User in my code, but create it as Users in the database."
 
 /**
@@ -35,6 +12,32 @@ model User {
  * Without @@map you have to pick one convention and let it leak into the other world.
  * With @@map, each side gets the naming style that feels natural to it.
  */
+// schema - how we want our table to be like.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // prisma will automatically add the updated at time .
+
+  eventTypes             EventType[] // one to many relationship with event types.
+  availabilityRules      AvailabilityRule[] // one to many relationship with availability rules.
+  availabilityExceptions AvailabilityException[] // one to many relationship with availability exceptions.
+  slots                  Slot[] // one to many relationship with slots.
+  bookings               Booking[]               @relation("HostBookings") // one to many relationship with bookings.
+
+  @@map("users")
+}
 
 model EventType {
   id                  Int      @id @default(autoincrement())
@@ -51,8 +54,92 @@ model EventType {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
+  slots    Slot[]
+  bookings Booking[]
+
   host User @relation(fields: [hostId], references: [id], onDelete: Cascade)
 
   @@unique([hostId, slug])
   @@map("event_types")
+}
+
+model AvailabilityRule {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  weekday   Int
+  startTime String
+  endTime   String
+  timezone  String   @default("UTC")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, weekday])
+  @@map("availability_rules")
+}
+
+model AvailabilityException {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  date      DateTime @db.Date
+  type      String
+  startTime String?
+  endTime   String?
+  timezone  String   @default("UTC")
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@map("availability_exceptions")
+}
+
+model Slot {
+  id          Int      @id @default(autoincrement())
+  hostId      Int
+  eventTypeId Int
+  startAt     DateTime
+  endAt       DateTime
+  status      String   @default("AVAILABLE")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+
+  host      User      @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  eventType EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([eventTypeId, startAt, endAt])
+  @@index([hostId, startAt])
+  @@index([eventTypeId, startAt, status])
+  @@map("slots")
+}
+
+model Booking {
+  id              Int       @id @default(autoincrement())
+  hostId          Int
+  eventTypeId     Int
+  slotId          Int
+  inviteeEmail    String
+  inviteeNotes    String?
+  inviteeName     String
+  status          String    @default("PENDING")
+  meetLink        String?
+  calendarEventId String?
+  cancelledAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  host      User      @relation("HostBookings", fields: [hostId], references: [id], onDelete: Cascade)
+  eventType EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+  slot      Slot      @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([inviteeEmail])
+  @@index([hostId, createdAt])
+  @@map("bookings")
 }
